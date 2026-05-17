@@ -1,6 +1,26 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  apiServerAddress: "0.0.0.0" # Listen on all interfaces to allow access from outside the cluster
 nodes:
   - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          certSANs:
+          - "192.168.0.100" # IP address of the host machine
+          - "100.72.212.126" # TailScale IP address of the host machine
+          - "ubuntu-server" # Magic DNS name for the host machine
+          - "localhost" # Localhost for in-cluster access
+          - "127.0.0.1" # Localhost for in-cluster access
+    extraPortMappings:
+      - containerPort: 6443
+        hostPort: 6443
+        listenAddress: "0.0.0.0" # Listen on all interfaces to allow access from outside the cluster
+        protocol: TCP
   - role: worker
-  - role: worker
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".containerd]
+      discard_unpacked_layers = false # Prevents containerd from discarding unpacked layers, which can help with debugging and performance in some cases

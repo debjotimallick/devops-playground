@@ -26,5 +26,12 @@ services:
       #
       # Only show containers matching a filter. See https://dozzle.dev/guide/filters
       # - DOZZLE_FILTER=label=com.example.app
+    networks:
+      - caddy
+
 volumes:
   dozzle_data:
+
+networks:
+  caddy:
+    external: true
